@@ -54,7 +54,7 @@ namespace AudibleApi.Common
 		}
 
 		/// <summary>json => object using AudibleApi.Common serializers</summary>
-		public static T FromJson<T>(JObject json) => json.ToObject<T>(JsonSerializer.Create(ReadSettings));
+		public static T FromJson<T>(JToken json) => json.ToObject<T>(JsonSerializer.Create(ReadSettings));
 
 		/// <summary>object => json using AudibleApi.Common serializers</summary>
 		public static string ToJson(object self) => JsonConvert.SerializeObject(self, Formatting.Indented, WriteSettings);

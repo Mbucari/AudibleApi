@@ -16,7 +16,13 @@ namespace AudibleApi.Common
 	public enum DrmType
 	{
         Adrm,
-        Mpeg
+        Mpeg,
+		PlayReady,
+		Hls,
+		Dash,
+		FairPlay,
+		Widevine,
+		HlsCmaf
 	}
 
     public partial class ContentLicenseDtoV10

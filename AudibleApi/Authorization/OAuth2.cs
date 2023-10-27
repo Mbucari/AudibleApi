@@ -62,7 +62,7 @@ namespace AudibleApi.Authorization
 						{ "app_name",  Resources.AppName },
 						{ "app_version", Resources.AppVersion },
 						{ "device_name",  $"%FIRST_NAME%%FIRST_NAME_POSSESSIVE_STRING%%DUPE_STRATEGY_1ST%{RegistrationOptions.DeviceName}" },
-						{ "os_version",  Resources.IosVersion },
+						{ "os_version",  Resources.OsVersion },
 						{ "software_version",  Resources.SoftwareVersion },
 						{ "device_model",  Resources.DeviceModel },
 					}
