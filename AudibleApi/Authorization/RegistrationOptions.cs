@@ -55,7 +55,7 @@ public record RegistrationOptions
 				: $"amzn_audible_android_aui_{locale.CountryCode}";
 			page_id = locale.WithUsername
 				? $"amzn_audible_android_privatepool_aui_v2_dark_{locale.CountryCode}"
-				: $"amzn_audible_android_aui_v2_dark_us{locale.CountryCode}";
+				: $"amzn_audible_android_aui_v2_dark_{locale.CountryCode}";
 		}
 
 		var oauth_params = new Dictionary<string, string>
@@ -120,7 +120,7 @@ public record RegistrationOptions
 		if (profile.UseIosDeviceSerial)
 			return Guid.NewGuid().ToString("N").ToUpperInvariant();
 
-		Span<byte> serial_bytes = stackalloc byte[20];
+		Span<byte> serial_bytes = stackalloc byte[10];
 		Random.Shared.NextBytes(serial_bytes);
 		return Convert.ToHexStringLower(serial_bytes);
 	}

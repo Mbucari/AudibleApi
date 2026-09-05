@@ -27,7 +27,7 @@ public class DeviceRegistrationProfileTests
 	[TestMethod]
 	public void default_registration_options_use_audible_not_libation()
 	{
-		new RegistrationOptions().DeviceName.ShouldBe("Audible");
+		new RegistrationOptions().DeviceName.ShouldBe("Audible for Android");
 		new RegistrationOptions().Profile.ShouldBe(DeviceRegistrationProfile.CurrentAndroid);
 	}
 
@@ -48,7 +48,7 @@ public class RegistrationOptionsOAuthUrl
 		var q = Query(new RegistrationOptions(DeviceRegistrationProfile.CurrentAndroid), Locales.Us);
 
 		q["openid.assoc_handle"].ShouldBe("amzn_audible_android_aui_us");
-		q["pageId"].ShouldBe("amzn_audible_android_aui_v2_dark_usus");
+		q["pageId"].ShouldBe("amzn_audible_android_aui_v2_dark_us");
 		q["openid.return_to"].ShouldBe("https://www.audible.com/ap/maplanding");
 		q["disableLoginPrepopulate"].ShouldBe("1");
 		q["forceMobileLayout"].ShouldBeNull();
@@ -84,7 +84,7 @@ public class RegistrationOptionsOAuthUrl
 		var q = Query(new RegistrationOptions(DeviceRegistrationProfile.RetailAndroid), Locales.Us);
 
 		q["openid.assoc_handle"].ShouldBe("amzn_audible_android_aui_us");
-		q["pageId"].ShouldBe("amzn_audible_android_aui_v2_dark_usus");
+		q["pageId"].ShouldBe("amzn_audible_android_aui_v2_dark_us");
 		q["openid.return_to"].ShouldBe("https://www.audible.com/ap/maplanding");
 	}
 
@@ -123,11 +123,11 @@ public class RegistrationBody
 		data["device_type"]!.ToString().ShouldBe(Resources.DeviceType);
 		data["device_model"]!.ToString().ShouldBe("sdk_gphone64_x86_64");
 		data["app_name"]!.ToString().ShouldBe("com.audible.application");
-		data["device_name"]!.ToString().ShouldEndWith("Audible");
+		data["device_name"]!.ToString().ShouldEndWith("Audible for Android");
 		body["device_metadata"].ShouldNotBeNull();
-		body["device_metadata"]!["product"]!.ToString().ShouldBe("sdk_phone64_x86_64");
+		body["device_metadata"]!["product"]!.ToString().ShouldBe("sdk_gphone64_x86_64");
 		body["auth_data"]!["use_global_authentication"]!.ToString().ShouldBe("true");
-		body["cookies"]!["domain"]!.ToString().ShouldContain("audible.com");
+		body["cookies"]!["domain"]!.ToString().ShouldBe("www.amazon.com");
 		ClientIdContains(options, Resources.DeviceType);
 	}
 

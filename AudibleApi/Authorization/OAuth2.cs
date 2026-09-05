@@ -39,7 +39,7 @@ public record OAuth2
 		var serial = RegistrationOptions?.DeviceSerialNumber;
 		JToken cookiesDomain = profile.UseIosLoginSurface
 			? $".amazon.{locale.TopDomain}"
-			: locale.AudibleLoginUri().ToString();
+			: locale.LoginUri().Host;
 
 		var registrationData = new JObject
 		{
