@@ -82,6 +82,11 @@ public record OAuth2
 					{ "website_cookies", new JArray() }
 				}
 			},
+			{ "user_context_map", new JObject
+				{
+					{ "frc", RegistrationOptions?.GetFrcData(locale) }
+				}
+			},
 			{ "registration_data", registrationData },
 			{ "auth_data", authData },
 			{ "requested_extensions", new JArray

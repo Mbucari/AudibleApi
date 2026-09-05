@@ -95,7 +95,7 @@ public record RegistrationOptions
 		{
 			return new CookieCollection
 			{
-				new Cookie("frc", create_ios_frc_cookie(), "/ap", cookieDomain),
+				new Cookie("frc", GetFrcData(locale), "/ap", cookieDomain),
 				new Cookie("map-md", create_ios_map_md_cookie(), "/ap", cookieDomain),
 				new Cookie("amzn-app-id", "MAPiOSLib/6.0/ToHideRetailLink", "/ap", cookieDomain),
 			};
@@ -103,12 +103,16 @@ public record RegistrationOptions
 
 		return new CookieCollection
 		{
-			new Cookie("frc", create_android_frc_cookie(locale, DeviceSerialNumber), "/ap", cookieDomain),
+			new Cookie("frc", GetFrcData(locale), "/ap", cookieDomain),
 			new Cookie("map-md", create_android_map_md_cookie(), "/ap", cookieDomain),
 			new Cookie("sid", "", "/", cookieDomain),
 		};
 	}
 
+	public string GetFrcData(Locale locale)
+		=> Profile.UseIosLoginSurface ? create_ios_frc_cookie()
+		 : create_android_frc_cookie(locale, DeviceSerialNumber);
+			
 	private static string urlencode(IEnumerable<KeyValuePair<string, string>> nameValuePairs)
 		=> nameValuePairs
 		.Select(kvp => $"{System.Web.HttpUtility.UrlEncode(kvp.Key)}={System.Web.HttpUtility.UrlEncode(kvp.Value)}")
