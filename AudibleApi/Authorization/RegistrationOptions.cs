@@ -55,7 +55,7 @@ public record RegistrationOptions
 				: $"amzn_audible_android_aui_{locale.CountryCode}";
 			page_id = locale.WithUsername
 				? $"amzn_audible_android_privatepool_aui_v2_dark_{locale.CountryCode}"
-				: $"amzn_audible_android_aui_v2_dark_us{locale.CountryCode}";
+				: $"amzn_audible_android_aui_v2_dark_{locale.CountryCode}";
 		}
 
 		var oauth_params = new Dictionary<string, string>
@@ -95,7 +95,7 @@ public record RegistrationOptions
 		{
 			return new CookieCollection
 			{
-				new Cookie("frc", create_ios_frc_cookie(), "/ap", cookieDomain),
+				new Cookie("frc", GetFrcData(locale), "/ap", cookieDomain),
 				new Cookie("map-md", create_ios_map_md_cookie(), "/ap", cookieDomain),
 				new Cookie("amzn-app-id", "MAPiOSLib/6.0/ToHideRetailLink", "/ap", cookieDomain),
 			};
@@ -103,12 +103,16 @@ public record RegistrationOptions
 
 		return new CookieCollection
 		{
-			new Cookie("frc", create_android_frc_cookie(locale, DeviceSerialNumber), "/ap", cookieDomain),
+			new Cookie("frc", GetFrcData(locale), "/ap", cookieDomain),
 			new Cookie("map-md", create_android_map_md_cookie(), "/ap", cookieDomain),
 			new Cookie("sid", "", "/", cookieDomain),
 		};
 	}
 
+	public string GetFrcData(Locale locale)
+		=> Profile.UseIosLoginSurface ? create_ios_frc_cookie()
+		 : create_android_frc_cookie(locale, DeviceSerialNumber);
+			
 	private static string urlencode(IEnumerable<KeyValuePair<string, string>> nameValuePairs)
 		=> nameValuePairs
 		.Select(kvp => $"{System.Web.HttpUtility.UrlEncode(kvp.Key)}={System.Web.HttpUtility.UrlEncode(kvp.Value)}")
@@ -120,7 +124,7 @@ public record RegistrationOptions
 		if (profile.UseIosDeviceSerial)
 			return Guid.NewGuid().ToString("N").ToUpperInvariant();
 
-		Span<byte> serial_bytes = stackalloc byte[20];
+		Span<byte> serial_bytes = stackalloc byte[10];
 		Random.Shared.NextBytes(serial_bytes);
 		return Convert.ToHexStringLower(serial_bytes);
 	}

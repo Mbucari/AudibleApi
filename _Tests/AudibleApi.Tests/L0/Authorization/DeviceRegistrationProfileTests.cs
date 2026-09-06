@@ -18,16 +18,14 @@ public class DeviceRegistrationProfileTests
 	public void android_profiles_keep_the_widevine_device_type()
 	{
 		DeviceRegistrationProfile.CurrentAndroid.DeviceType.ShouldBe(Resources.DeviceType);
-		DeviceRegistrationProfile.RetailAndroid.DeviceType.ShouldBe(Resources.DeviceType);
 		DeviceRegistrationProfile.CurrentAndroid.IsAndroidAudibleApp.ShouldBeTrue();
-		DeviceRegistrationProfile.RetailAndroid.IsAndroidAudibleApp.ShouldBeTrue();
 		DeviceRegistrationProfile.Mkb79IPhone.IsAndroidAudibleApp.ShouldBeFalse();
 	}
 
 	[TestMethod]
 	public void default_registration_options_use_audible_not_libation()
 	{
-		new RegistrationOptions().DeviceName.ShouldBe("Audible");
+		new RegistrationOptions().DeviceName.ShouldBe("Audible for Android");
 		new RegistrationOptions().Profile.ShouldBe(DeviceRegistrationProfile.CurrentAndroid);
 	}
 
@@ -48,7 +46,7 @@ public class RegistrationOptionsOAuthUrl
 		var q = Query(new RegistrationOptions(DeviceRegistrationProfile.CurrentAndroid), Locales.Us);
 
 		q["openid.assoc_handle"].ShouldBe("amzn_audible_android_aui_us");
-		q["pageId"].ShouldBe("amzn_audible_android_aui_v2_dark_usus");
+		q["pageId"].ShouldBe("amzn_audible_android_aui_v2_dark_us");
 		q["openid.return_to"].ShouldBe("https://www.audible.com/ap/maplanding");
 		q["disableLoginPrepopulate"].ShouldBe("1");
 		q["forceMobileLayout"].ShouldBeNull();
@@ -76,16 +74,6 @@ public class RegistrationOptionsOAuthUrl
 		q["openid.assoc_handle"].ShouldBe("amzn_audible_ios_lap_de");
 		q["pageId"].ShouldBe("amzn_audible_ios_privatepool");
 		q["openid.return_to"].ShouldBe("https://www.audible.de/ap/maplanding");
-	}
-
-	[TestMethod]
-	public void retail_android_keeps_android_oauth_surface()
-	{
-		var q = Query(new RegistrationOptions(DeviceRegistrationProfile.RetailAndroid), Locales.Us);
-
-		q["openid.assoc_handle"].ShouldBe("amzn_audible_android_aui_us");
-		q["pageId"].ShouldBe("amzn_audible_android_aui_v2_dark_usus");
-		q["openid.return_to"].ShouldBe("https://www.audible.com/ap/maplanding");
 	}
 
 	private static System.Collections.Specialized.NameValueCollection Query(RegistrationOptions options, Locale locale)
@@ -123,11 +111,11 @@ public class RegistrationBody
 		data["device_type"]!.ToString().ShouldBe(Resources.DeviceType);
 		data["device_model"]!.ToString().ShouldBe("sdk_gphone64_x86_64");
 		data["app_name"]!.ToString().ShouldBe("com.audible.application");
-		data["device_name"]!.ToString().ShouldEndWith("Audible");
+		data["device_name"]!.ToString().ShouldEndWith("Audible for Android");
 		body["device_metadata"].ShouldNotBeNull();
-		body["device_metadata"]!["product"]!.ToString().ShouldBe("sdk_phone64_x86_64");
+		body["device_metadata"]!["product"]!.ToString().ShouldBe("sdk_gphone64_x86_64");
 		body["auth_data"]!["use_global_authentication"]!.ToString().ShouldBe("true");
-		body["cookies"]!["domain"]!.ToString().ShouldContain("audible.com");
+		body["cookies"]!["domain"]!.ToString().ShouldBe("www.amazon.com");
 		ClientIdContains(options, Resources.DeviceType);
 	}
 
@@ -150,24 +138,6 @@ public class RegistrationBody
 		body["cookies"]!["domain"]!.ToString().ShouldBe(".amazon.com");
 		options.DeviceSerialNumber.Length.ShouldBe(32);
 		ClientIdContains(options, "A2CZJZGLK2JJVM");
-	}
-
-	[TestMethod]
-	public void retail_android_is_android_without_emulator_strings()
-	{
-		var options = new RegistrationOptions(DeviceRegistrationProfile.RetailAndroid);
-		var body = Body(options);
-		var data = (JObject)body["registration_data"]!;
-
-		data["device_type"]!.ToString().ShouldBe(Resources.DeviceType);
-		data["device_model"]!.ToString().ShouldBe("Pixel 8");
-		data["os_version"]!.ToString().ShouldContain("release-keys");
-		data["os_version"]!.ToString().ShouldNotContain("ranchu");
-		data["os_version"]!.ToString().ShouldNotContain("sdk_gphone");
-		body["device_metadata"].ShouldNotBeNull();
-		body["device_metadata"]!["product"]!.ToString().ShouldBe("shiba");
-		body["device_metadata"]!["model"]!.ToString().ShouldBe("Pixel 8");
-		ClientIdContains(options, Resources.DeviceType);
 	}
 
 	private static JObject Body(DeviceRegistrationKind kind)
@@ -221,19 +191,6 @@ public class SignInCookies
 		var mapMd = DecodeMapMd(cookies["map-md"].Value);
 		mapMd["app_identifier"]!["bundle_id"]!.ToString().ShouldBe("com.audible.iphone");
 		mapMd["app_identifier"]!["app_version"]!.ToString().ShouldBe("3.56.2");
-	}
-
-	[TestMethod]
-	public void retail_android_frc_is_not_an_emulator_and_has_no_local_ip()
-	{
-		var options = new RegistrationOptions(DeviceRegistrationProfile.RetailAndroid);
-		var frcCookie = options.GetSignInCookies(Locales.Us).Cast<Cookie>().Single(c => c.Name == "frc");
-		var frc = JObject.Parse(FrcEncoder.Decode(options.DeviceSerialNumber, frcCookie.Value));
-
-		frc["DeviceName"]!.ToString().ShouldBe("Pixel 8");
-		frc["DeviceOSVersion"]!.ToString().ShouldContain("release-keys");
-		frc["DeviceOSVersion"]!.ToString().ShouldNotContain("userdebug");
-		frc["IpAddress"].ShouldBeNull();
 	}
 
 	private static JObject DecodeMapMd(string value)

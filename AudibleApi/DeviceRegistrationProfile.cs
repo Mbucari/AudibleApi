@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace AudibleApi;
 
@@ -29,10 +30,11 @@ public sealed class DeviceRegistrationProfile
 {
 	public static DeviceRegistrationProfile CurrentAndroid { get; } = CreateCurrentAndroid();
 	public static DeviceRegistrationProfile Mkb79IPhone { get; } = CreateMkb79IPhone();
-	public static DeviceRegistrationProfile RetailAndroid { get; } = CreateRetailAndroid();
 	public static DeviceRegistrationProfile Default => CurrentAndroid;
+	public static IEnumerable<DeviceRegistrationProfile> AllProfiles => [CurrentAndroid, Mkb79IPhone];
 
 	public DeviceRegistrationKind Kind { get; private init; }
+	public string Description { get; private init; } = "";
 
 	/// <summary>Amazon device type id. Android Audible app is <see cref="Resources.DeviceType"/>.</summary>
 	public string DeviceType { get; private init; } = "";
@@ -71,9 +73,8 @@ public sealed class DeviceRegistrationProfile
 	public static DeviceRegistrationProfile FromKind(DeviceRegistrationKind kind)
 		=> kind switch
 		{
-			DeviceRegistrationKind.CurrentAndroid => CurrentAndroid,
+			DeviceRegistrationKind.CurrentAndroid or DeviceRegistrationKind.RetailAndroid => CurrentAndroid,
 			DeviceRegistrationKind.Mkb79IPhone => Mkb79IPhone,
-			DeviceRegistrationKind.RetailAndroid => RetailAndroid,
 			_ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown device registration kind.")
 		};
 
@@ -81,8 +82,9 @@ public sealed class DeviceRegistrationProfile
 		=> new()
 		{
 			Kind = DeviceRegistrationKind.CurrentAndroid,
+			Description = "Android emulator (default)",
 			DeviceType = Resources.DeviceType,
-			AmazonDeviceName = "Audible",
+			AmazonDeviceName = "Audible for Android",
 			AppName = Resources.AppName,
 			AppVersion = Resources.AppVersion,
 			AppVersionName = Resources.AppVersionName,
@@ -97,9 +99,9 @@ public sealed class DeviceRegistrationProfile
 			DeviceProduct = Resources.DeviceProduct,
 			MapVersion = Resources.MapVersion,
 			FrcDeviceName = Resources.DeviceName,
-			FrcApplicationVersion = "2090254511",
-			ScreenWidthPixels = "1344",
-			ScreenHeightPixels = "2769",
+			FrcApplicationVersion = Resources.AppVersion,
+			ScreenWidthPixels = "1080",
+			ScreenHeightPixels = "2400",
 			RegistrationDataDomain = "DeviceLegacy",
 			IncludeDeviceMetadata = true,
 			UseGlobalAuthentication = true,
@@ -108,41 +110,11 @@ public sealed class DeviceRegistrationProfile
 			UseIosDeviceSerial = false,
 		};
 
-	private static DeviceRegistrationProfile CreateRetailAndroid()
-		=> new()
-		{
-			Kind = DeviceRegistrationKind.RetailAndroid,
-			DeviceType = Resources.DeviceType,
-			AmazonDeviceName = "Audible",
-			AppName = Resources.AppName,
-			AppVersion = Resources.AppVersion,
-			AppVersionName = Resources.AppVersionName,
-			DeviceModel = "Pixel 8",
-			OsVersion = "google/shiba/shiba:14/AP2A.240805.005/12025142:user/release-keys",
-			OsVersionNumber = Resources.OsVersionNumber,
-			SoftwareVersion = Resources.SoftwareVersion,
-			UserAgent = "Mozilla/5.0 (Linux; Android 14; Pixel 8 Build/AP2A.240805.005; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/113.0.5672.136 Mobile Safari/537.36",
-			DownloadUserAgent = Resources.Download_User_Agent,
-			OsFamily = Resources.OsFamily,
-			Manufacturer = "Google",
-			DeviceProduct = "shiba",
-			MapVersion = Resources.MapVersion,
-			FrcDeviceName = "Pixel 8",
-			FrcApplicationVersion = Resources.AppVersion,
-			ScreenWidthPixels = "1080",
-			ScreenHeightPixels = "2400",
-			RegistrationDataDomain = "DeviceLegacy",
-			IncludeDeviceMetadata = true,
-			UseGlobalAuthentication = true,
-			UseIosLoginSurface = false,
-			IncludeLocalIpInFrc = false,
-			UseIosDeviceSerial = false,
-		};
-
 	private static DeviceRegistrationProfile CreateMkb79IPhone()
 		=> new()
 		{
 			Kind = DeviceRegistrationKind.Mkb79IPhone,
+			Description = "iPhone / audible-cli (experimental; no Widevine)",
 			DeviceType = "A2CZJZGLK2JJVM",
 			AmazonDeviceName = "Audible for iPhone",
 			AppName = "Audible",
